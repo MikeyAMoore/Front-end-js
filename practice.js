@@ -1,12 +1,27 @@
 class Vue {
     constructor(options) {
-      const el = document.querySelector(options.el);
-      const data = options.data;
-      
-      Object.keys(data).forEach(key => {
-        el.innerHTML = el.innerHTML.replace(
-          `{{ ${key} }}`,
-          data[key]
-        );
-      });
+      this.el = document.querySelector(options.el);
+      this.data = options.data;
+  
+      this.replaceTemplateStrings();
+    }
+  
+    replaceTemplateStrings() {
+      const stack = [this.el];
+      while (stack.length) {
+        const n = stack.pop();
+        if (n.childNodes.length) {
+          stack.push(...n.childNodes);
+        }
+  
+        if (n.nodeType === Node.TEXT_NODE) {
+          Object.keys(this.data).forEach(key => {
+            n.textContent = n.textContent.replace(
+              new RegExp(`{{ ${key} }}`, "g"),
+              this.data[key]
+            );
+          });
+        }
+      }
+    }
   }
